@@ -1,6 +1,8 @@
 import React from 'react'
-import { useFilters, useGlobalFilter, useSortBy, useTable } from 'react-table'
+import { useFilters, useSortBy, useTable } from 'react-table'
 import { matchSorter } from 'match-sorter'
+import { useExportData } from 'react-table-plugins'
+import Papa from 'papaparse'
 
 const fuzzyTextFilterFn = (rows, id, filterValue) => {
   return matchSorter(rows, filterValue, { keys: [row => row.values[id]] })
@@ -19,6 +21,13 @@ function DefaultColumnFilter({
   )
 }
 
+const getExportFileBlob = ({ columns, data }) => {
+  const headerNames = columns.map((col) => col.exportValue);
+  const csvString = Papa.unparse({ fields: headerNames, data });
+
+  return new Blob([csvString], { type: "text/csv" });
+}
+
 function Table({ columns, data }) {
   const defaultColumn = React.useMemo(
     () => ({
@@ -28,6 +37,7 @@ function Table({ columns, data }) {
   )
 
   const {
+    exportData,
     getTableProps,
     getTableBodyProps,
     headerGroups,
@@ -38,10 +48,12 @@ function Table({ columns, data }) {
       columns,
       data,
       defaultColumn,
+      getExportFileBlob,
+      getExportFileName: () => 'nfl-rushing',
     },
     useFilters,
-    useGlobalFilter,
     useSortBy,
+    useExportData,
   )
 
   const isSortableColumn = (headerId) => {
@@ -62,39 +74,42 @@ function Table({ columns, data }) {
   }
 
   return (
-    <table {...getTableProps()}>
-      <thead>
-        {headerGroups.map(headerGroup => (
-          <tr {...headerGroup.getHeaderGroupProps()}>
-            {headerGroup.headers.map(column => (
-              isSortableColumn(column.id) ?
-              <th {...column.getHeaderProps(column.getSortByToggleProps())}>
-                {column.render('Header')}
-                <span>
-                  {column.isSorted ? column.isSortedDesc ? ' ▲' : ' ▼' : ''}
-                </span>
-              </th> :
-              <th {...column.getHeaderProps()}>
-                {column.render('Header')}
-                <div>{isFilterableColumn(column.id) ? column.render('Filter') : null}</div>
-              </th>
-            ))}
-          </tr>
-        ))}
-      </thead>
-      <tbody {...getTableBodyProps()}>
-        {rows.map((row, i) => {
-          prepareRow(row)
-          return (
-            <tr {...row.getRowProps()}>
-              {row.cells.map(cell => {
-                return <td {...cell.getCellProps()}>{cell.render('Cell')}</td>
-              })}
+    <>
+      <button onClick={() => exportData('csv', false)}>Export to CSV</button>
+      <table {...getTableProps()}>
+        <thead>
+          {headerGroups.map(headerGroup => (
+            <tr {...headerGroup.getHeaderGroupProps()}>
+              {headerGroup.headers.map(column => (
+                isSortableColumn(column.id) ?
+                <th {...column.getHeaderProps(column.getSortByToggleProps())}>
+                  {column.render('Header')}
+                  <span>
+                    {column.isSorted ? column.isSortedDesc ? ' ▲' : ' ▼' : ''}
+                  </span>
+                </th> :
+                <th {...column.getHeaderProps()}>
+                  {column.render('Header')}
+                  <div>{isFilterableColumn(column.id) ? column.render('Filter') : null}</div>
+                </th>
+              ))}
             </tr>
-          )
-        })}
-      </tbody>
-    </table>
+          ))}
+        </thead>
+        <tbody {...getTableBodyProps()}>
+          {rows.map((row, i) => {
+            prepareRow(row)
+            return (
+              <tr {...row.getRowProps()}>
+                {row.cells.map(cell => {
+                  return <td {...cell.getCellProps()}>{cell.render('Cell')}</td>
+                })}
+              </tr>
+            )
+          })}
+        </tbody>
+      </table>
+    </>
   )
 }
 
