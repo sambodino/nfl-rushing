@@ -1,4 +1,4 @@
-import { useTable } from 'react-table'
+import { useSortBy, useTable } from 'react-table'
 
 function Table({ columns, data }) {
   const {
@@ -7,10 +7,26 @@ function Table({ columns, data }) {
     headerGroups,
     rows,
     prepareRow,
-  } = useTable({
-    columns,
-    data,
-  })
+  } = useTable(
+    {
+      columns,
+      data,
+    },
+    useSortBy,
+  )
+
+  const isSortableColumn = (headerId) => {
+    switch (headerId) {
+      case 'Yds':
+        return true
+      case 'Lng': 
+        return true
+      case 'TD': 
+        return true
+      default:
+        return false
+    }
+  }
 
   return (
     <table {...getTableProps()}>
@@ -18,7 +34,16 @@ function Table({ columns, data }) {
         {headerGroups.map(headerGroup => (
           <tr {...headerGroup.getHeaderGroupProps()}>
             {headerGroup.headers.map(column => (
-              <th {...column.getHeaderProps()}>{column.render('Header')}</th>
+              isSortableColumn(column.id) ?
+              <th {...column.getHeaderProps(column.getSortByToggleProps())}>
+                {column.render('Header')}
+                <span>
+                  {column.isSorted ? column.isSortedDesc ? ' ▲' : ' ▼' : ''}
+                </span>
+              </th> :
+              <th {...column.getHeaderProps()}>
+                {column.render('Header')}
+              </th>
             ))}
           </tr>
         ))}
