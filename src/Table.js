@@ -1,7 +1,8 @@
 import React from 'react'
-import { useFilters, useSortBy, useTable } from 'react-table'
-import { matchSorter } from 'match-sorter'
+import { FixedSizeList } from 'react-window'
+import { useBlockLayout, useFilters, useSortBy, useTable } from 'react-table'
 import { useExportData } from 'react-table-plugins'
+import { matchSorter } from 'match-sorter'
 import Papa from 'papaparse'
 
 const fuzzyTextFilterFn = (rows, id, filterValue) => {
@@ -32,6 +33,7 @@ function Table({ columns, data }) {
   const defaultColumn = React.useMemo(
     () => ({
       Filter: DefaultColumnFilter,
+      width: 75,
     }),
     []
   )
@@ -42,6 +44,7 @@ function Table({ columns, data }) {
     getTableBodyProps,
     headerGroups,
     rows,
+    totalColumnsWidth,
     prepareRow,
   } = useTable(
     {
@@ -51,6 +54,7 @@ function Table({ columns, data }) {
       getExportFileBlob,
       getExportFileName: () => 'nfl-rushing',
     },
+    useBlockLayout,
     useFilters,
     useSortBy,
     useExportData,
@@ -73,42 +77,64 @@ function Table({ columns, data }) {
     return headerId === 'Player'
   }
 
+  const RenderRow = React.useCallback(
+    ({ index, style }) => {
+      const row = rows[index]
+      prepareRow(row)
+      return (
+        <div
+          {...row.getRowProps({
+            style,
+          })}
+          className="tr"
+        >
+          {row.cells.map(cell => {
+            return (
+              <div {...cell.getCellProps()} className="td">
+                {cell.render('Cell')}
+              </div>
+            )
+          })}
+        </div>
+      )
+    },
+    [prepareRow, rows]
+  )
+
   return (
     <>
-      <button onClick={() => exportData('csv', false)}>Export to CSV</button>
-      <table {...getTableProps()}>
-        <thead>
+      <button onClick={() => exportData('csv', false)} style={{display:'block'}}>Export to CSV</button>
+      <div {...getTableProps()}  className="table">
+        <div>
           {headerGroups.map(headerGroup => (
-            <tr {...headerGroup.getHeaderGroupProps()}>
+            <div {...headerGroup.getHeaderGroupProps()} className="tr">
               {headerGroup.headers.map(column => (
                 isSortableColumn(column.id) ?
-                <th {...column.getHeaderProps(column.getSortByToggleProps())}>
+                <div {...column.getHeaderProps(column.getSortByToggleProps())} className="th">
                   {column.render('Header')}
                   <span>
                     {column.isSorted ? column.isSortedDesc ? ' ▲' : ' ▼' : ''}
                   </span>
-                </th> :
-                <th {...column.getHeaderProps()}>
+                </div> :
+                <div {...column.getHeaderProps()} className="th">
                   {column.render('Header')}
                   <div>{isFilterableColumn(column.id) ? column.render('Filter') : null}</div>
-                </th>
+                </div>
               ))}
-            </tr>
+            </div>
           ))}
-        </thead>
-        <tbody {...getTableBodyProps()}>
-          {rows.map((row, i) => {
-            prepareRow(row)
-            return (
-              <tr {...row.getRowProps()}>
-                {row.cells.map(cell => {
-                  return <td {...cell.getCellProps()}>{cell.render('Cell')}</td>
-                })}
-              </tr>
-            )
-          })}
-        </tbody>
-      </table>
+        </div>
+        <div {...getTableBodyProps()}>
+          <FixedSizeList
+            height={400}
+            itemCount={rows.length}
+            itemSize={35}
+            width={totalColumnsWidth}
+          >
+            {RenderRow}
+          </FixedSizeList>
+        </div>
+      </div>
     </>
   )
 }

@@ -8,31 +8,32 @@ import './App.css';
 
 const Styles = styled.div`
   padding: 1rem;
-
-  table {
+ 
+  .table {
+    display: inline-block;
     border-spacing: 0;
     border: 1px solid black;
 
-    tr {
+    .tr {
       :last-child {
-        td {
+        .td {
           border-bottom: 0;
         }
       }
     }
 
-    th,
-    td {
+    .th,
+    .td {
       margin: 0;
       padding: 0.5rem;
       border-bottom: 1px solid black;
       border-right: 1px solid black;
 
       :last-child {
-        border-right: 0;
+        border-right: 1px solid black;
       }
     }
-  }
+}
 `
 
 function App() {
@@ -45,6 +46,7 @@ function App() {
             Header: 'Player',
             accessor: 'Player',
             filter: 'fuzzyText',
+            width: 200,
           },
           {
             Header: 'Team',
