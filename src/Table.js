@@ -1,6 +1,32 @@
-import { useSortBy, useTable } from 'react-table'
+import React from 'react'
+import { useFilters, useGlobalFilter, useSortBy, useTable } from 'react-table'
+import { matchSorter } from 'match-sorter'
+
+const fuzzyTextFilterFn = (rows, id, filterValue) => {
+  return matchSorter(rows, filterValue, { keys: [row => row.values[id]] })
+}
+fuzzyTextFilterFn.autoRemove = val => !val
+
+function DefaultColumnFilter({
+  column: { filterValue, setFilter },
+}) {
+  return (
+    <input
+      value={filterValue || ''}
+      onChange={e => setFilter(e.target.value || undefined)}
+      placeholder={`Search by player...`}
+    />
+  )
+}
 
 function Table({ columns, data }) {
+  const defaultColumn = React.useMemo(
+    () => ({
+      Filter: DefaultColumnFilter,
+    }),
+    []
+  )
+
   const {
     getTableProps,
     getTableBodyProps,
@@ -11,7 +37,10 @@ function Table({ columns, data }) {
     {
       columns,
       data,
+      defaultColumn,
     },
+    useFilters,
+    useGlobalFilter,
     useSortBy,
   )
 
@@ -26,6 +55,10 @@ function Table({ columns, data }) {
       default:
         return false
     }
+  }
+
+  const isFilterableColumn = (headerId) => {
+    return headerId === 'Player'
   }
 
   return (
@@ -43,6 +76,7 @@ function Table({ columns, data }) {
               </th> :
               <th {...column.getHeaderProps()}>
                 {column.render('Header')}
+                <div>{isFilterableColumn(column.id) ? column.render('Filter') : null}</div>
               </th>
             ))}
           </tr>

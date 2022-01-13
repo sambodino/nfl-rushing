@@ -44,6 +44,7 @@ function App() {
           {
             Header: 'Player',
             accessor: 'Player',
+            filter: 'fuzzyText',
           },
           {
             Header: 'Team',
