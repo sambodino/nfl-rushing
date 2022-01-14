@@ -37,84 +37,11 @@ const Styles = styled.div`
 `
 
 function App() {
-  const columns = React.useMemo(
-    () => [
-      {
-        Header: 'NFL Rushing',
-        columns: [
-          {
-            Header: 'Player',
-            accessor: 'Player',
-            filter: 'fuzzyText',
-            width: 200,
-          },
-          {
-            Header: 'Team',
-            accessor: 'Team',
-          },
-          {
-            Header: 'Pos',
-            accessor: 'Pos',
-          },
-          {
-            Header: 'Att',
-            accessor: 'Att',
-          },
-          {
-            Header: 'Att/G',
-            accessor: 'Att/G',
-          },
-          {
-            Header: 'Yds',
-            accessor: 'Yds',
-          },
-          {
-            Header: 'Avg',
-            accessor: 'Avg',
-          },
-          {
-            Header: 'Yds/G',
-            accessor: 'Yds/G',
-          },
-          {
-            Header: 'TD',
-            accessor: 'TD',
-          },
-          {
-            Header: 'Lng',
-            accessor: 'Lng',
-          },
-          {
-            Header: '1st',
-            accessor: '1st',
-          },
-          {
-            Header: '1st%',
-            accessor: '1st%',
-          },
-          {
-            Header: '20+',
-            accessor: '20+',
-          },
-          {
-            Header: '40+',
-            accessor: '40+',
-          },
-          {
-            Header: 'FUM',
-            accessor: 'FUM',
-          },
-        ],
-      },
-    ],
-    []
-  )
-
   const data = React.useMemo(() => getData(), [])
 
   return (
     <Styles>
-      <Table columns={columns} data={data} />
+      <Table data={data} />
     </Styles>
   )
 }
