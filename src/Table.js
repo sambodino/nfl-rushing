@@ -29,7 +29,17 @@ const getExportFileBlob = ({ columns, data }) => {
   return new Blob([csvString], { type: "text/csv" });
 }
 
+const scrollbarWidth = () => {
+  const scrollDiv = document.createElement('div')
+  scrollDiv.setAttribute('style', 'width: 100px; height: 100px; overflow: scroll; position:absolute; top:-9999px;')
+  document.body.appendChild(scrollDiv)
+  const scrollbarWidth = scrollDiv.offsetWidth - scrollDiv.clientWidth
+  document.body.removeChild(scrollDiv)
+  return scrollbarWidth
+}
+
 function Table({ columns, data }) {
+  const scrollBarSize = React.useMemo(() => scrollbarWidth(), [])
   const defaultColumn = React.useMemo(
     () => ({
       Filter: DefaultColumnFilter,
@@ -113,7 +123,7 @@ function Table({ columns, data }) {
                 <div {...column.getHeaderProps(column.getSortByToggleProps())} className="th">
                   {column.render('Header')}
                   <span>
-                    {column.isSorted ? column.isSortedDesc ? ' ▲' : ' ▼' : ''}
+                    {column.isSorted ? column.isSortedDesc ? ' ▲' : ' ▼' : '◆'}
                   </span>
                 </div> :
                 <div {...column.getHeaderProps()} className="th">
@@ -129,7 +139,7 @@ function Table({ columns, data }) {
             height={400}
             itemCount={rows.length}
             itemSize={35}
-            width={totalColumnsWidth}
+            width={totalColumnsWidth+scrollBarSize}
           >
             {RenderRow}
           </FixedSizeList>
