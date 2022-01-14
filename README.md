@@ -1,9 +1,10 @@
 # NFL Rushing Table
 
-This table allows you to visualize rushers in the NFL with their stats.
+This table is written in React via client-side rendering and allows you to visualize rushers in the NFL with their stats.
 
+![Screen Recording 2022-01-13 at 8 02 20 PM](https://user-images.githubusercontent.com/12937792/149446584-9b4b0044-6f64-406f-b9ca-53cfa69bba15.gif)
 
-*This solution has been tested with 100,000 records and performs well.*
+*This solution has been load tested with 100,000 records and performs well.*
 
 ## Installation and running this solution
 Set your Node version to v16:
@@ -21,7 +22,7 @@ Run tests:
 npm test
 ```
 
-Run the app:
+Run the app and open a browser to `http://localhost:3000/`:
 ```
 npm start
 ```
