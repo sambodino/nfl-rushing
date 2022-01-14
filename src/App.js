@@ -1,8 +1,9 @@
 import React from 'react'
 import styled from 'styled-components'
 
-import Table from './Table'
-import getData from './data';
+import Table from './table/Table'
+import getData from './data/data';
+import { tableColumns } from './table/utils'
 
 import './App.css';
 
@@ -37,11 +38,12 @@ const Styles = styled.div`
 `
 
 function App() {
+  const columns = React.useMemo(() => tableColumns, [])
   const data = React.useMemo(() => getData(), [])
 
   return (
     <Styles>
-      <Table data={data} />
+      <Table columns={columns} data={data} />
     </Styles>
   )
 }

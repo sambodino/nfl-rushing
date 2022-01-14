@@ -2,13 +2,8 @@ import React from 'react'
 import { FixedSizeList } from 'react-window'
 import { useBlockLayout, useFilters, useSortBy, useTable } from 'react-table'
 import { useExportData } from 'react-table-plugins'
-import { matchSorter } from 'match-sorter'
-import Papa from 'papaparse'
 
-const fuzzyTextFilterFn = (rows, id, filterValue) => {
-  return matchSorter(rows, filterValue, { keys: [row => row.values[id]] })
-}
-fuzzyTextFilterFn.autoRemove = val => !val
+import { getExportFileBlob, scrollbarWidth } from './utils'
 
 function DefaultColumnFilter({
   column: { filterValue, setFilter },
@@ -22,101 +17,13 @@ function DefaultColumnFilter({
   )
 }
 
-const getExportFileBlob = ({ columns, data }) => {
-  const headerNames = columns.map((col) => col.exportValue);
-  const csvString = Papa.unparse({ fields: headerNames, data });
-
-  return new Blob([csvString], { type: "text/csv" });
-}
-
-const scrollbarWidth = () => {
-  const scrollDiv = document.createElement('div')
-  scrollDiv.setAttribute('style', 'width: 100px; height: 100px; overflow: scroll; position:absolute; top:-9999px;')
-  document.body.appendChild(scrollDiv)
-  const scrollbarWidth = scrollDiv.offsetWidth - scrollDiv.clientWidth
-  document.body.removeChild(scrollDiv)
-  return scrollbarWidth
-}
-
-function Table({ data }) {
+function Table({ columns, data }) {
   const scrollBarSize = React.useMemo(() => scrollbarWidth(), [])
   const defaultColumn = React.useMemo(
     () => ({
       Filter: DefaultColumnFilter,
       width: 75,
     }),
-    []
-  )
-  const columns = React.useMemo(() =>
-    [
-      {
-        Header: 'NFL Rushing',
-        columns: [
-          {
-            Header: 'Player',
-            accessor: 'Player',
-            filter: 'fuzzyText',
-            width: 200,
-          },
-          {
-            Header: 'Team',
-            accessor: 'Team',
-          },
-          {
-            Header: 'Pos',
-            accessor: 'Pos',
-          },
-          {
-            Header: 'Att',
-            accessor: 'Att',
-          },
-          {
-            Header: 'Att/G',
-            accessor: 'Att/G',
-          },
-          {
-            Header: 'Yds',
-            accessor: 'Yds',
-          },
-          {
-            Header: 'Avg',
-            accessor: 'Avg',
-          },
-          {
-            Header: 'Yds/G',
-            accessor: 'Yds/G',
-          },
-          {
-            Header: 'TD',
-            accessor: 'TD',
-          },
-          {
-            Header: 'Lng',
-            accessor: 'Lng',
-          },
-          {
-            Header: '1st',
-            accessor: '1st',
-          },
-          {
-            Header: '1st%',
-            accessor: '1st%',
-          },
-          {
-            Header: '20+',
-            accessor: '20+',
-          },
-          {
-            Header: '40+',
-            accessor: '40+',
-          },
-          {
-            Header: 'FUM',
-            accessor: 'FUM',
-          },
-        ],
-      },
-    ],
     []
   )
 

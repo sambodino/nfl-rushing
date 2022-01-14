@@ -1,12 +1,13 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { tableColumns } from './utils';
 
 import Table from './Table';
 
 describe('NFL Rushing Table', () => {
 
   beforeEach(() => {
-    render(<Table data={tableData}/>)
+    render(<Table columns={tableColumns} data={tableData}/>)
   })
 
   it('should sort by total rushing yards', async () => {
